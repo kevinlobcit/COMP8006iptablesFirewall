@@ -1,0 +1,35 @@
+clear table
+clear nat table
+clear mangle table
+
+set input drop
+set forward drop
+set output drop
+
+set postrouting from extNIC to masquerade traffic from internal outwards
+
+set prerouting mangle minimize delay for ssh
+set prerouting mangle maximize throughput for ftp
+set prerouting from external network into internal network(allow external network to start connection inside network)
+
+drop forwarded dport 80 to sport 0-1023
+drop spoofed internal network addresses coming from externalNIC
+drop inbound SYN to high ports 1024-65535
+drop forwarded SYN,FIN
+drop forwareded telnet dport23
+
+allow external->internal ssh
+allow internal->external ssh
+
+allow external->internal www
+allow internal->external www
+
+allow external->internal USER_TCP_RANGE
+allow internal->external USER_TCP_RANGE
+
+allow external->internal USER_UDP_RANGE
+allow internal->external USER_UDP_RANGE
+
+
+allow external->internal USER_ICMP_TYPES
+allow internal->external USER_ICMP_TYPES

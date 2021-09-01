@@ -1,0 +1,53 @@
+#!/bin/bash
+tcpdump -v -n -q
+tcpdump -w filename.pcap ""
+
+
+#######ACCEPT RULE TESTING#######
+#test 1 inbound/outbound
+#accept ssh
+hping3 192.168.1.250 -S -p 22 -c 1
+
+#test 2 inbound/outbound
+#accept http/https
+hping3 192.168.1.250 -S -p 80 -c 1
+
+#test 3 inbound/outbound
+#accept userdef TCP
+hping3 192.168.1.250 -S -p 53,21,20 -c 1
+
+#test 4 inbound/outbound
+#accept userdef UDP
+hping3 192.168.1.250 -2 -p 53,21 -c 1
+
+#test 5 inbound/outbound
+#accept userdef ICMP
+hping3 192.168.1.250 -1 --icmptype 8,0 -c 1
+
+#######DROP RULE TESTING#######
+#test 6 inbound
+#from src port 0 to 1023 to dest port 80
+hping3 192.168.1.250 -S -s 1 -p 80 -c 1
+
+#test 7 inbound
+#drop packets with src address of internal network but coming from external NIC
+hping3 192.168.1.250 -S -p 80 -a 192.168.2.5 -c 1
+
+#test 8 inbound
+#drop packets incoming from high ports 1024 to 65535
+hping3 192.168.1.250 -S -p 1024 -c 1
+
+#test 9 general
+#drop packets with SYNFIN 
+hping3 192.168.1.251 -S -F -p 80 -c 1
+
+#test 10 general
+#drop telnet
+hping3 192.168.1.250 -S -p 23 -c 1
+
+#test 11 check FTP and SSH minimum delay and FTP maximum throughput
+iptables -t mangle -L -v -n --line-numbers
+
+#test 12 nmap verify ports
+nmap ipaddress
+
